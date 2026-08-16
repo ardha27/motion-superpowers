@@ -40,7 +40,14 @@ Metodologi rekayasa animasi terstruktur berbasis disiplin **Superpowers** untuk 
    - 1 hero move per scene. Tidak semua elemen bergerak bersamaan.
    - Hold minimal `0.3s - 1.0s` setelah gerakan kunci mendarat agar visual bernafas.
    - Easing konsisten: pilih 1 kurva signature (misal: `cubic-bezier(0.22, 1, 0.36, 1)` atau `power4.out`).
-7. **Complete Audio Architecture (BGM + Dual SFX)**:
+7. **Strict 2.5D & Anti-Patah GSAP Engine Rules (Hard Rule)**:
+   - **No CSS Transition Conflict**: Dilarang memasang CSS `transition` (misal `transition: transform 0.1s`) pada elemen yang dianimasikan oleh GSAP. CSS dan GSAP akan berebut penulisan transform tiap frame sehingga animasi patah/jitter.
+   - **2D/3D Layer Isolation**: CSS Engine memaksa `transform-style: preserve-3d` menjadi `flat` 2D setiap kali elemen memiliki `opacity < 1`. DILARANG menganimasikan `opacity` langsung pada container `preserve-3d`. Gunakan **Parent 2D Wrapper** khusus untuk `opacity`, dan **Child 3D Container** khusus untuk `transform-style: preserve-3d`.
+   - **Seek-Safe `fromTo()`**: DILARANG memakai `.to()` pada tween entrance/exit di headless renderer. Seluruh tween WAJIB berupa `.fromTo()` agar `start` dan `end` value terikat penuh per frame dan tahan terhadap frame-seeking non-monotonik.
+   - **No Drift/Exit Temporal Overlap**: Selesaikan `drift` tween tepat pada timestamp awal `exit` tween (misal: drift berakhir di `dur - 0.4s` dan exit mulai di `dur - 0.4s`).
+   - **GPU Compositor Only (`x`/`y`/`scale`/`autoAlpha`)**: Selalu gunakan `x`, `y`, `scaleX`, `scaleY` alih-alih `top`, `left`, `width`, `height` (menghindari layout thrashing/reflow). Gunakan `autoAlpha` alih-alih `opacity` murni untuk otomatis menyembunyikan `visibility: hidden` saat opacity = 0.
+   - **Selective `will-change` Promotion**: Berikan `will-change: transform` pada elemen hero yang dianimasikan, tetapi DILARANG memasangnya secara global pada seluruh elemen (mencegah pembengkakan GPU VRAM).
+8. **Complete Audio Architecture (BGM + Dual SFX)**:
    - **BGM Generation (Suno AI)**: Gunakan script tool `scripts/generate_bgm.sh` untuk menghasilkan custom BGM instrumental sesuai BPM & style proyek.
    - **Cinematic & Big Transitions**: Gunakan `~/external-skills/video-shotcraft/assets/audio/sfx/` (149 SFX: impact, whoosh, riser, camera shutter, glitch).
    - **Micro-Interactions & UI Actions**: Gunakan `~/external-skills/uisfx/sounds/` (1.800+ SFX terorganisir dalam 12 tema: *cinematic, studio, minimal, soft, zen, scifi, glass, arcade, mechanical, organic, rubber, dreamy*).
@@ -182,13 +189,16 @@ Bagi video menjadi segmen scene/shot terisolasi:
 - **HyperFrames**: Gunakan GSAP timeline yang disinkronkan dengan frame player.
 - Pastikan ukuran tipografi mobile-safe (label/pill minimal `16-24px`).
 
-### Fase 5: Still Frame QA (TDD Visual)
-Sebelum merender seluruh video, ekstrak still frame kunci untuk verifikasi:
+### Fase 5: Still Frame QA & Static Motion Audit (TDD Visual)
+Sebelum merender seluruh video, jalankan pemeriksaan statis bebas-patah dan ekstrak still frame kunci untuk verifikasi:
 ```bash
-# Remotion still check
+# 1. Automatic Static Smoothness Audit (Deteksi CSS conflict, preserve-3d opacity, seek-unsafe .to(), typo scale)
+python3 ~/.hermes/skills/superpowers/skills/motion-superpowers/scripts/audit_motion_smoothness.py index.html
+
+# 2. Remotion still check (visual verification)
 npx remotion still src/index.ts <CompositionName> out/check-frame-30.png --frame=30
 ```
-Periksa alignment, hierarchy, akurasi data/teks, keterbacaan tipografi, dan ketiadaan glitch rendering.
+Periksa alignment, hierarchy, akurasi data/teks, keterbacaan tipografi (label/pill >= 16px), dan ketiadaan glitch/patah rendering.
 
 ### Fase 6: Render & Verification
 Render video final dan jalankan pemeriksaan durasi/audio stream:
@@ -203,6 +213,7 @@ ffprobe -v error -show_entries format=duration,size:stream=codec_name -of defaul
 
 ## 6. Referensi & Tools
 - **MOTION.md Style Catalog**: `references/motion-*.md` (14 style rulebook)
+- **Static Motion Smoothness Auditor**: `~/.hermes/skills/superpowers/skills/motion-superpowers/scripts/audit_motion_smoothness.py`
 - **Grounded Research & Citations**: `~/.hermes/skills/research/grounded-citations/` & `deep-research/`
 - **Suno BGM Generator**: `~/.hermes/skills/motion-superpowers/scripts/generate_bgm.sh`
 - **Shot Recipes (152 Cards)**: `~/.hermes/skills/motion-craft/video-shotcraft/`
