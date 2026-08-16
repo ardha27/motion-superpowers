@@ -1,0 +1,75 @@
+# MOTION.md: Game Impact
+
+## Overview
+
+Game Impact defines punchy, reward-heavy motion for playful interfaces, game UI, launch demos, and high-energy promotional pages. Use it when interactions should feel satisfying, reactive, and dramatic. Motion can include anticipation, overshoot, rebound, impact frames, particles, glow, and short shake effects, but must remain accessible and should not be used for serious productivity flows.
+
+## Motion Philosophy
+
+Motion should feel punchy, energetic, and rewarding. Use anticipation, overshoot, impact frames, particles, shake, and strong feedback. This style is for demos, game UI, launches, and playful experiences.
+
+## Core Tokens
+
+| Token | Value | Use |
+| --- | --- | --- |
+| `--motion-ease-impact` | `cubic-bezier(0.34, 1.56, 0.64, 1)` | Impact bounce |
+| `--motion-ease-slam` | `cubic-bezier(0.7, -0.4, 0.2, 1.4)` | Aggressive entrance |
+| `--motion-hit` | `120ms` | Impact frame |
+| `--motion-fast` | `220ms` | Buttons and pickups |
+| `--motion-default` | `420ms` | Cards and panels |
+| `--motion-combo` | `700ms` | Reward sequence |
+
+## Entrance
+
+- Hero title: scale `1.3 -> 0.92 -> 1`, opacity `0 -> 1`, `420ms`.
+- Cards: rotate `-4deg -> 0`, y `40px -> 0`, stagger `50ms`.
+- Buttons: anticipation scale `0.85 -> 1.08 -> 1`.
+- Badges: pop with overshoot and optional particle burst.
+
+## Interaction
+
+- Button hover: scale `1.08`, glow, `220ms`.
+- Button press: scale `0.9`, then rebound to `1.06`.
+- Card hover: lift `-10px`, rotate `1deg` to `3deg`, shadow intensifies.
+- Success state: pulse, burst, count-up, or shine sweep.
+
+## Effects
+
+- Screen shake allowed only for explicit impact moments, max `6px`, max `180ms`.
+- Particles must be short-lived, under `700ms`.
+- Looping attention effects must be rare and pause on hover/focus when needed.
+
+## Scroll
+
+- Use explosive stagger for showcase pages.
+- Maximum total stagger delay `500ms`.
+
+## Component Motion
+
+| Component | Motion |
+| --- | --- |
+| Button | Hover scales `1.08` with glow; press compresses to `0.9`, then rebounds to `1.06` before settling. |
+| Card | Hover lifts `-10px`, rotates `1deg` to `3deg`, and intensifies shadow; selected cards may pop with particles. |
+| Dialog | Enter with anticipation scale `0.86 -> 1.08 -> 1`, opacity `0 -> 1`, `420ms`; overlay can flash subtly on reward moments. |
+| Popover/Menu | Items pop in with `40ms` stagger; active item can punch scale `1.04` and glow. |
+| Inventory/Badge | Pickup uses arc motion, scale overshoot, and short particle burst under `700ms`. |
+| Tabs | Indicator slams or snaps to target with overshoot; content swaps with quick scale `0.96 -> 1`. |
+| Toast/Achievement | Use combo sequence: pop, shine, count-up, then settle within `700ms`; allow manual dismissal. |
+| Form field | Keep typing calm; validation success can pulse once, errors may shake max `4px` for `120ms`. |
+| Progress/Score | Animate count-up and meter fill with impact ticks; avoid rapid flashing. |
+| Loading | Use playful loops sparingly; pause or simplify when content is ready or reduced motion is active. |
+
+## Reduced Motion
+
+- Disable shake, particles, bounce, and large scale changes.
+- Replace with color, opacity, and short scale under `1.02`.
+
+## Don't
+
+- Do not use this style for serious dashboards or forms.
+- Do not shake text while users are reading.
+- Do not run infinite pulsing on many elements.
+
+## Agent Instructions
+
+Generate energetic motion with anticipation, impact, rebound, rewards, and strong interaction feedback while respecting reduced motion.
